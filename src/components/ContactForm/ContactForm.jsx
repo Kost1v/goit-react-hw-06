@@ -1,7 +1,10 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import React from "react";
 import * as Yup from "yup";
-import css from "./ContactForm.module.css"
+import css from "./ContactForm.module.css";
+import { nanoid } from "nanoid";
+
+import { useDispatch } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
 
 const phoneNumberRegex =
   /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
@@ -25,10 +28,18 @@ const INITIAL_VALUES = {
   id: "",
 };
 
-const ContactForm = ({onAddProfile}) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
 
-  const handleSubmit = (values, actions) => {    
-    onAddProfile(values)
+  const onAddProfile = (values, actions) => {
+    const finalContacts = {
+      ...values,
+      id: nanoid(),
+    };
+
+    const action = addContact(finalContacts);
+    dispatch(action);
+
     actions.resetForm();
   };
 
@@ -36,7 +47,7 @@ const ContactForm = ({onAddProfile}) => {
     <Formik
       initialValues={INITIAL_VALUES}
       validationSchema={AddProfileSchema}
-      onSubmit={handleSubmit}
+      onSubmit={onAddProfile}
     >
       <Form className={css.form}>
         <label className={css.label}>
